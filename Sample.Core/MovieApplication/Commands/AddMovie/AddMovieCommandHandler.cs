@@ -1,32 +1,36 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sample.DAL.Model.WriteModels;
+using Sample.Core.Common;
+using Sample.DAL;
+using Sample.DAL.Models.WriteModels;
 using Sample.DAL.WriteRepositories;
 
 namespace Sample.Core.MovieApplication.Commands.AddMovie
 {
-    public class AddMovieCommandHandler : IRequestHandler<AddMovieCommand, AddMovieCommandResult>
+    public class AddMovieCommandHandler : IRequestHandler<AddMovieCommand>
     {
-        private readonly IMediator _mediator;
+        private readonly ApplicationDbContext _db;
         private readonly WriteMovieRepository _movieRepository;
         private readonly DirectorRepository _directorRepository;
+        private readonly ChannelQueue<MovieAddedEvent> _channel;
 
-        public AddMovieCommandHandler(IMediator mediator, WriteMovieRepository movieRepository, DirectorRepository directorRepository)
+        public AddMovieCommandHandler(ApplicationDbContext db, WriteMovieRepository movieRepository, DirectorRepository directorRepository, ChannelQueue<MovieAddedEvent> channel)
         {
-            _mediator = mediator;
+            _db = db;
             _movieRepository = movieRepository;
             _directorRepository = directorRepository;
+            _channel = channel;
         }
 
-        public async Task<AddMovieCommandResult> Handle(AddMovieCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AddMovieCommand request, CancellationToken cancellationToken)
         {
-            var director = await _directorRepository.GetDirectorAsync(request.Director, cancellationToken);
+            var director = await _directorRepository.GetByNameAsync(request.Director, cancellationToken);
 
             if (director is null)
             {
                 director = new Director { FullName = request.Director };
-                await _directorRepository.AddDirectorAsync(director, cancellationToken);
+                await _directorRepository.AddAsync(director, cancellationToken);
             }
 
             var movie = new Movie
@@ -38,9 +42,13 @@ namespace Sample.Core.MovieApplication.Commands.AddMovie
                 Director = director
             };
 
-            await _movieRepository.AddMovieAsync(movie);
+            await _movieRepository.AddAsync(movie, cancellationToken);
 
-            return new AddMovieCommandResult { MovieId = movie.Id };
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await _channel.AddAsync(new MovieAddedEvent { MovieId = movie.Id }, cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

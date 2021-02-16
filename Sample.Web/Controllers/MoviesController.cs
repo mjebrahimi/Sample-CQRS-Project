@@ -41,12 +41,9 @@ namespace Sample.Web.Controllers
         [HttpPost("DeleteMovie")]
         public async Task<IActionResult> DeleteMovie(DeleteMovieCommand model, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(model, cancellationToken);
+            await _mediator.Send(model, cancellationToken);
 
-            if (result)
-                return Ok();
-
-            return BadRequest();
+            return Ok();
         }
     }
 }

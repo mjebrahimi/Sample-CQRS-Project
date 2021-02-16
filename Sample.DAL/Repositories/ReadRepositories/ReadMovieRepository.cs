@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Sample.DAL.Model.ReadModels;
+using Sample.DAL.Models.ReadModels;
 using Sample.DAL.ReadRepositories.Common;
 
 namespace Sample.DAL.ReadRepositories

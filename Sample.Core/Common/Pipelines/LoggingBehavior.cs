@@ -15,16 +15,16 @@ namespace Sample.Core.Common.Pipelines
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             try
             {
-                return await next();
+                return next();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return null;
+                return Task.FromResult<TResponse>(default);
             }
         }
     }

@@ -1,35 +1,39 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sample.Core.Common.BaseChannel;
-using Sample.Core.MovieApplication.BackgroundWorker.Common.Channels;
+using Sample.Core.Common;
+using Sample.DAL;
 using Sample.DAL.WriteRepositories;
 
 namespace Sample.Core.MovieApplication.Commands.DeleteMovie
 {
-   public class DeleteMovieCommandHandler:IRequestHandler<DeleteMovieCommand,bool>
-   {
-       private readonly WriteMovieRepository _writeMovieRepository;
-       private readonly ChannelQueue<DeleteModelChannel> _channelQueue;
+    public class DeleteMovieCommandHandler : IRequestHandler<DeleteMovieCommand>
+    {
+        private readonly ApplicationDbContext _db;
+        private readonly WriteMovieRepository _movieRepository;
+        private readonly ChannelQueue<MovieDeletedEvent> _channel;
 
-       public DeleteMovieCommandHandler(WriteMovieRepository writeMovieRepository, ChannelQueue<DeleteModelChannel> channelQueue)
-       {
-           _writeMovieRepository = writeMovieRepository;
-           _channelQueue = channelQueue;
-       }
-
-        public async Task<bool> Handle(DeleteMovieCommand request, CancellationToken cancellationToken)
+        public DeleteMovieCommandHandler(ApplicationDbContext db, WriteMovieRepository movieRepository, ChannelQueue<MovieDeletedEvent> channel)
         {
-            var movie = await _writeMovieRepository.GetMovieByIdAsync(request.MovieId, cancellationToken);
+            _db = db;
+            _movieRepository = movieRepository;
+            _channel = channel;
+        }
 
-            if (movie is null)
-                return false;
+        public async Task<Unit> Handle(DeleteMovieCommand request, CancellationToken cancellationToken)
+        {
+            var movie = await _movieRepository.GetByIdAsync(request.MovieId, cancellationToken);
 
-            _writeMovieRepository.DeleteMovie(movie);
+            if (!(movie is null))
+            {
+                _movieRepository.Delete(movie);
 
-            await _channelQueue.AddToChannelAsync(new DeleteModelChannel{MovieId = movie.Id}, cancellationToken);
+                await _db.SaveChangesAsync(cancellationToken);
 
-            return true;
+                await _channel.AddAsync(new MovieDeletedEvent { MovieId = movie.Id }, cancellationToken);
+            }
+
+            return Unit.Value;
         }
     }
 }

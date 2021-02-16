@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sample.DAL.Model.WriteModels
+namespace Sample.DAL.Models.WriteModels
 {
     public class Director
     {

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Sample.DAL.Model.ReadModels;
+using Sample.DAL.Models.ReadModels;
 
 namespace Sample.Core.MovieApplication.Queries.GetMovieByName
 {

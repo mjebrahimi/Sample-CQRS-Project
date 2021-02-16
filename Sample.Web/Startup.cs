@@ -6,16 +6,15 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sample.Core.Common.BaseChannel;
-using Sample.Core.Common.Marks;
 using Sample.Core.Common.Pipelines;
 using Sample.Core.MovieApplication.BackgroundWorker.AddReadMovie;
-using Sample.Core.MovieApplication.BackgroundWorker.Common.Channels;
 using Sample.Core.MovieApplication.BackgroundWorker.DeleteReadMovie;
 using Sample.DAL;
 using Sample.DAL.ReadRepositories;
 using Sample.DAL.WriteRepositories;
 using MongoDB.Driver;
+using Sample.Core.Common;
+using Sample.Core.MovieApplication.Commands.AddMovie;
 
 namespace Sample.Web
 {
@@ -44,7 +43,6 @@ namespace Sample.Web
 
             services.AddSingleton(typeof(ChannelQueue<>));
 
-
             #region Mongo Singleton Injection
 
             var mongoClient = new MongoClient("mongodb://localhost:27017");
@@ -53,15 +51,14 @@ namespace Sample.Web
 
             #endregion
 
-
             services.AddScoped<ReadMovieRepository>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             #endregion
 
-            services.AddMediatR(typeof(ICommitable).Assembly);
+            services.AddMediatR(typeof(AddMovieCommand).Assembly);
 
-            services.AddHostedService<AddReadModelWorker>();
+            services.AddHostedService<AddReadMovieWorker>();
             services.AddHostedService<DeleteReadMovieWorker>();
 
             services.AddControllers();

@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Sample.DAL.Model.ReadModels
+namespace Sample.DAL.Models.ReadModels
 {
     public class Movie
     {

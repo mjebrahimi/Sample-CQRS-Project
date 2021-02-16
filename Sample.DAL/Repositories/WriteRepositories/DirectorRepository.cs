@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Sample.DAL.Model.WriteModels;
+using Sample.DAL.Models.WriteModels;
 
 namespace Sample.DAL.WriteRepositories
 {
@@ -14,12 +14,12 @@ namespace Sample.DAL.WriteRepositories
             _db = db;
         }
 
-        public Task<Director> GetDirectorAsync(string name, CancellationToken cancellationToken = default)
+        public Task<Director> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             return _db.Directors.FirstOrDefaultAsync(d => d.FullName == name, cancellationToken: cancellationToken);
         }
 
-        public async Task AddDirectorAsync(Director director, CancellationToken cancellationToken = default)
+        public async Task AddAsync(Director director, CancellationToken cancellationToken = default)
         {
             await _db.Directors.AddAsync(director, cancellationToken);
         }

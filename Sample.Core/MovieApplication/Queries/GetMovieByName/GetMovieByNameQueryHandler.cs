@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Sample.DAL.Model.ReadModels;
+using Sample.DAL.Models.ReadModels;
 using Sample.DAL.ReadRepositories;
 
 namespace Sample.Core.MovieApplication.Queries.GetMovieByName

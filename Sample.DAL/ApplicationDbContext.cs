@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sample.DAL.Model.WriteModels;
+using Sample.DAL.Models.WriteModels;
 
 namespace Sample.DAL
 {

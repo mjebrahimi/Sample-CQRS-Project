@@ -1,6 +1,6 @@
 ﻿namespace Sample.Core.MovieApplication.Commands.AddMovie
 {
-    public class AddMovieCommandResult
+    public class MovieAddedEvent
     {
         public int MovieId { get; set; }
     }

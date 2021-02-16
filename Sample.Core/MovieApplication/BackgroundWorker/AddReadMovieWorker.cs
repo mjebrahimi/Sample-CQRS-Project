@@ -4,23 +4,23 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Sample.Core.Common.BaseChannel;
-using Sample.Core.MovieApplication.BackgroundWorker.Common.Channels;
-using Sample.DAL.Model.ReadModels;
+using Sample.Core.Common;
+using Sample.Core.MovieApplication.Commands.AddMovie;
+using Sample.DAL.Models.ReadModels;
 using Sample.DAL.ReadRepositories;
 using Sample.DAL.WriteRepositories;
 
 namespace Sample.Core.MovieApplication.BackgroundWorker.AddReadMovie
 {
-    public class AddReadModelWorker : BackgroundService
+    public class AddReadMovieWorker : BackgroundService
     {
-        private readonly ChannelQueue<ReadModelChannel> _readModelChannel;
-        private readonly ILogger<AddReadModelWorker> _logger;
+        private readonly ChannelQueue<MovieAddedEvent> _channel;
+        private readonly ILogger<AddReadMovieWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public AddReadModelWorker(ChannelQueue<ReadModelChannel> readModelChannel, ILogger<AddReadModelWorker> logger, IServiceProvider serviceProvider)
+        public AddReadMovieWorker(ChannelQueue<MovieAddedEvent> channel, ILogger<AddReadMovieWorker> logger, IServiceProvider serviceProvider)
         {
-            _readModelChannel = readModelChannel;
+            _channel = channel;
             _logger = logger;
             _serviceProvider = serviceProvider;
         }
@@ -30,13 +30,14 @@ namespace Sample.Core.MovieApplication.BackgroundWorker.AddReadMovie
             {
                 using var scope = _serviceProvider.CreateScope();
 
-                var writeRepository = scope.ServiceProvider.GetRequiredService<WriteMovieRepository>();
+                var writeMovieRepository = scope.ServiceProvider.GetRequiredService<WriteMovieRepository>();
                 var readMovieRepository = scope.ServiceProvider.GetRequiredService<ReadMovieRepository>();
+
                 try
                 {
-                    await foreach (var item in _readModelChannel.ReturnValue(stoppingToken))
+                    await foreach (var item in _channel.ReadAsync(stoppingToken))
                     {
-                        var movie = await writeRepository.GetMovieByIdAsync(item.MovieId, stoppingToken);
+                        var movie = await writeMovieRepository.GetByIdAsync(item.MovieId, stoppingToken);
 
                         if (movie != null)
                         {

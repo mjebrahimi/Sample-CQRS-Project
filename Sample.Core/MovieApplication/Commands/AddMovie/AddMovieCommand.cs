@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Sample.Core.MovieApplication.Commands.AddMovie
 {
-    public class AddMovieCommand : IRequest<AddMovieCommandResult>
+    public class AddMovieCommand : IRequest
     {
         [Required]
         public string Name { get; set; }

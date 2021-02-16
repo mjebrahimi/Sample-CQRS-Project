@@ -24,7 +24,7 @@ namespace Sample.DAL.Migrations
             modelBuilder.HasSequence("EntityFrameworkHiLoSequence")
                 .IncrementsBy(10);
 
-            modelBuilder.Entity("Sample.DAL.Model.WriteModels.Director", b =>
+            modelBuilder.Entity("Sample.DAL.Models.WriteModels.Director", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +39,7 @@ namespace Sample.DAL.Migrations
                     b.ToTable("Directors");
                 });
 
-            modelBuilder.Entity("Sample.DAL.Model.WriteModels.Movie", b =>
+            modelBuilder.Entity("Sample.DAL.Models.WriteModels.Movie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,9 +69,9 @@ namespace Sample.DAL.Migrations
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("Sample.DAL.Model.WriteModels.Movie", b =>
+            modelBuilder.Entity("Sample.DAL.Models.WriteModels.Movie", b =>
                 {
-                    b.HasOne("Sample.DAL.Model.WriteModels.Director", "Director")
+                    b.HasOne("Sample.DAL.Models.WriteModels.Director", "Director")
                         .WithMany("Movies")
                         .HasForeignKey("DirectorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -80,7 +80,7 @@ namespace Sample.DAL.Migrations
                     b.Navigation("Director");
                 });
 
-            modelBuilder.Entity("Sample.DAL.Model.WriteModels.Director", b =>
+            modelBuilder.Entity("Sample.DAL.Models.WriteModels.Director", b =>
                 {
                     b.Navigation("Movies");
                 });
